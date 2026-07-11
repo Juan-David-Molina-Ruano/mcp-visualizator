@@ -1,0 +1,8 @@
+# These owners will be automatically requested for review
+# when a PR touches code in these paths
+
+* @Juan-David-Molina-Ruano
+
+# Security-sensitive files
+/.github/        @Juan-David-Molina-Ruano
+/SECURITY.md    @Juan-David-Molina-Ruano

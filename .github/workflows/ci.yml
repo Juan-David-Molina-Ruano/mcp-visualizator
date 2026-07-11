@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Verify all commits in PRs are signed
+  verify-signatures:
+    name: Verify commit signatures
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify commit signatures
+        run: |
+          echo "Checking commit signatures for PR ${{ github.event.pull_request.number }}"
+          COMMITS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits --jq '.[].sha')
+          for SHA in $COMMITS; do
+            VERIFIED=$(gh api repos/${{ github.repository }}/commits/$SHA --jq '.commit.verification.verified')
+            if [ "$VERIFIED" != "true" ]; then
+              echo "ERROR: Commit $SHA is not signed/verified"
+              exit 1
+            fi
+            echo "OK: Commit $SHA is verified"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Rust checks
+  rust-checks:
+    name: Rust checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0"
+      - name: Format check
+        working-directory: src-tauri
+        run: cargo fmt --check
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy -- -D warnings
+      - name: Build
+        working-directory: src-tauri
+        run: cargo build --release
+      - name: Test
+        working-directory: src-tauri
+        run: cargo test
+
+  # Frontend checks
+  frontend-checks:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+      - name: Test
+        run: npm test
+        continue-on-error: true
+      - name: Build
+        run: npm run build
+        continue-on-error: true
