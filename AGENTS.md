@@ -56,7 +56,7 @@ Rust and npm supply chain attacks are real. Crates like `onering`, `logflux`, an
 | `pnpm-lock.yaml` | Version pinning — committed to repo | Required |
 | `allowBuilds` | Block postinstall scripts by default | pnpm-workspace.yaml |
 | `blockExoticSubdeps` | Block git/tarball transitive deps | pnpm-workspace.yaml |
-| `minimumReleaseAge: 1440` | Delay new versions by 24h | pnpm-workspace.yaml |
+| `minimumReleaseAge: 2880` (numeric, minutes) | Delay new versions by 48h | pnpm-workspace.yaml |
 | `trustPolicy: no-downgrade` | Block trust-level downgrades | pnpm-workspace.yaml |
 
 ### Banned Crates

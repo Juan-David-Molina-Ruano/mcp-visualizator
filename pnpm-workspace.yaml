@@ -15,9 +15,9 @@ allowBuilds:
 # Ensures all transitive dependencies resolve from trusted sources.
 blockExoticSubdeps: true
 
-# Delay dependency updates by 24 hours (1440 minutes) to catch compromised versions.
+# Delay dependency updates by 48 hours (2880 minutes) to catch compromised versions.
 # Malware is usually detected quickly; waiting 24h prevents most bad installs.
-minimumReleaseAge: "1440"
+minimumReleaseAge: 2880
 
 # Prevent installation of a package if its trust level has decreased
 # compared to previous releases (e.g., was published by a trusted publisher
