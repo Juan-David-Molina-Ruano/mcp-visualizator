@@ -95,9 +95,9 @@ jobs:
         working-directory: src-tauri
         run: cargo supply-chain update && cargo supply-chain
 
-  # npm vulnerability scanning
-  npm-audit:
-    name: npm security audit
+  # pnpm vulnerability scanning
+  pnpm-audit:
+    name: pnpm security audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -110,17 +110,20 @@ jobs:
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Skipping npm audit — package.json not found"
+            echo "Skipping pnpm audit — package.json not found"
           fi
+      - name: Setup pnpm
+        if: steps.check.outputs.exists == 'true'
+        uses: pnpm/action-setup@v4
       - name: Setup Node.js
         if: steps.check.outputs.exists == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
       - name: Install dependencies
         if: steps.check.outputs.exists == 'true'
-        run: npm ci
-      - name: npm audit
+        run: pnpm install --frozen-lockfile
+      - name: pnpm audit
         if: steps.check.outputs.exists == 'true'
-        run: npm audit --audit-level=high
+        run: pnpm audit --audit-level=high

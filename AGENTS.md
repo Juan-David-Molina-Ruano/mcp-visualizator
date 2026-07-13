@@ -14,7 +14,7 @@
 | Backend | Rust | Stable (via Rustup) |
 | Desktop | Tauri | 2.0 |
 | Runtime | Node.js | 24.x |
-| Package Manager | npm | 11.x |
+| Package Manager | pnpm | 11.x |
 
 ## Branching & Governance
 
@@ -36,7 +36,7 @@
 
 ## Supply Chain Security
 
-Rust and npm supply chain attacks are real. Crates like `onering`, `logflux`, and `exploration` were pulled from crates.io for malicious code in 2025-2026. This project defends against this from day one.
+Rust and npm supply chain attacks are real. Crates like `onering`, `logflux`, and `exploration` were pulled from crates.io for malicious code in 2025-2026. This project uses pnpm with strict supply chain defaults to defend against npm attacks from day one.
 
 ### Rust Supply Chain Defense
 
@@ -48,12 +48,16 @@ Rust and npm supply chain attacks are real. Crates like `onering`, `logflux`, an
 | `Cargo.lock` | Version pinning — committed to repo | Required |
 | `deny.toml` | Banned crate list + license policy | Repo root |
 
-### npm Supply Chain Defense
+### npm/pnpm Supply Chain Defense
 
-| Tool | Purpose | Status |
-|------|---------|--------|
-| `npm audit` | Known vulnerability scanning | CI (security.yml) |
-| `package-lock.json` | Version pinning — committed to repo | Required |
+| Tool / Setting | Purpose | Status |
+|----------------|---------|--------|
+| `pnpm audit` | Known vulnerability scanning | CI (security.yml) |
+| `pnpm-lock.yaml` | Version pinning — committed to repo | Required |
+| `allowBuilds` | Block postinstall scripts by default | pnpm-workspace.yaml |
+| `blockExoticSubdeps` | Block git/tarball transitive deps | pnpm-workspace.yaml |
+| `minimumReleaseAge: 1440` | Delay new versions by 24h | pnpm-workspace.yaml |
+| `trustPolicy: no-downgrade` | Block trust-level downgrades | pnpm-workspace.yaml |
 
 ### Banned Crates
 
@@ -80,7 +84,7 @@ Any crate marked as `malicious` in RustSec will also be caught by `cargo-audit` 
 
 - All GitHub Actions use `permissions: contents: read` by default (least privilege)
 - No secrets passed to PRs from forks
-- Dependabot monitors all ecosystems weekly (cargo, npm, github-actions)
+- Dependabot monitors all ecosystems weekly (cargo, pnpm/npm, github-actions)
 - Commit signatures verified on all PRs to `main`
 - `cargo-deny` checks run on every push to `main`, every PR targeting `main`, and on the weekly schedule
 - Node version in CI matches local (24.x)
