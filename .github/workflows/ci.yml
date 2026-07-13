@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Verify commit signatures
         run: |
           echo "Checking commit signatures for PR ${{ github.event.pull_request.number }}"
@@ -37,50 +38,81 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Rust checks
+  # Rust checks (skip until src-tauri/Cargo.toml exists)
   rust-checks:
     name: Rust checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check if Rust project exists
+        id: check
+        run: |
+          if [ -f "src-tauri/Cargo.toml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping Rust checks — src-tauri/Cargo.toml not found"
+          fi
       - name: Install Rust
+        if: steps.check.outputs.exists == 'true'
         uses: dtolnay/rust-toolchain@stable
       - name: Install Tauri CLI
+        if: steps.check.outputs.exists == 'true'
         run: cargo install tauri-cli --version "^2.0"
       - name: Format check
+        if: steps.check.outputs.exists == 'true'
         working-directory: src-tauri
         run: cargo fmt --check
       - name: Clippy
+        if: steps.check.outputs.exists == 'true'
         working-directory: src-tauri
         run: cargo clippy -- -D warnings
       - name: Build
+        if: steps.check.outputs.exists == 'true'
         working-directory: src-tauri
         run: cargo build --release
       - name: Test
+        if: steps.check.outputs.exists == 'true'
         working-directory: src-tauri
         run: cargo test
 
-  # Frontend checks
+  # Frontend checks (skip until package.json exists)
   frontend-checks:
     name: Frontend checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check if frontend project exists
+        id: check
+        run: |
+          if [ -f "package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping frontend checks — package.json not found"
+          fi
       - name: Setup Node.js
+        if: steps.check.outputs.exists == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
       - name: Install dependencies
+        if: steps.check.outputs.exists == 'true'
         run: npm ci
       - name: Type check
+        if: steps.check.outputs.exists == 'true'
         run: npx tsc --noEmit
       - name: Lint
+        if: steps.check.outputs.exists == 'true'
         run: npm run lint
-        continue-on-error: true
       - name: Test
+        if: steps.check.outputs.exists == 'true'
         run: npm test
-        continue-on-error: true
       - name: Build
+        if: steps.check.outputs.exists == 'true'
         run: npm run build
-        continue-on-error: true

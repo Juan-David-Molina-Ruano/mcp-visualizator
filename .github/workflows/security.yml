@@ -12,30 +12,115 @@ permissions:
   contents: read
 
 jobs:
+  # Known vulnerability scanning via RustSec advisory DB
   cargo-audit:
-    name: Rust security audit
+    name: Rust security audit (cargo-audit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check if Rust project exists
+        id: check
+        run: |
+          if [ -f "src-tauri/Cargo.toml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping cargo-audit — src-tauri/Cargo.toml not found"
+          fi
       - name: Install Rust
+        if: steps.check.outputs.exists == 'true'
         uses: dtolnay/rust-toolchain@stable
       - name: Install cargo-audit
+        if: steps.check.outputs.exists == 'true'
         run: cargo install cargo-audit
       - name: Audit Rust dependencies
+        if: steps.check.outputs.exists == 'true'
         working-directory: src-tauri
         run: cargo audit
 
+  # License compliance + banned crates + advisory checks
+  cargo-deny:
+    name: Rust license & ban check (cargo-deny)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check if Rust project exists
+        id: check
+        run: |
+          if [ -f "src-tauri/Cargo.toml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping cargo-deny — src-tauri/Cargo.toml not found"
+          fi
+      - name: Install Rust
+        if: steps.check.outputs.exists == 'true'
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-deny
+        if: steps.check.outputs.exists == 'true'
+        run: cargo install cargo-deny
+      - name: Run cargo-deny checks
+        if: steps.check.outputs.exists == 'true'
+        run: cargo deny check --config deny.toml --manifest-path src-tauri/Cargo.toml
+
+  # Publisher auditing — who published each crate in the dependency tree
+  cargo-supply-chain:
+    name: Rust publisher audit (cargo-supply-chain)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check if Rust project exists
+        id: check
+        run: |
+          if [ -f "src-tauri/Cargo.toml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping cargo-supply-chain — src-tauri/Cargo.toml not found"
+          fi
+      - name: Install Rust
+        if: steps.check.outputs.exists == 'true'
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-supply-chain
+        if: steps.check.outputs.exists == 'true'
+        run: cargo install cargo-supply-chain
+      - name: Audit publishers
+        if: steps.check.outputs.exists == 'true'
+        working-directory: src-tauri
+        run: cargo supply-chain update && cargo supply-chain
+
+  # npm vulnerability scanning
   npm-audit:
     name: npm security audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          persist-credentials: false
+      - name: Check if frontend project exists
+        id: check
+        run: |
+          if [ -f "package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping npm audit — package.json not found"
+          fi
+      - name: Setup Node.js
+        if: steps.check.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
           cache: "npm"
       - name: Install dependencies
+        if: steps.check.outputs.exists == 'true'
         run: npm ci
       - name: npm audit
+        if: steps.check.outputs.exists == 'true'
         run: npm audit --audit-level=high
-        continue-on-error: true

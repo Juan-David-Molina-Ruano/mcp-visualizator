@@ -29,9 +29,43 @@ This app is **local-first** and designed with these principles:
 4. **Minimal permissions** — CI/CD uses least-privilege GITHUB_TOKEN
 5. **Signed commits** — all commits to main must be signed/verified
 
+## Supply Chain Security
+
+Rust and npm supply chain attacks are real. This project defends against them with multiple layers:
+
+### Rust Supply Chain Defense
+
+| Layer | Tool | What it catches |
+|-------|------|-----------------|
+| Known vulnerabilities | `cargo-audit` | RustSec advisories for unsafe or malicious crates |
+| Banned/malicious crates | `cargo-deny` | Crates pulled from crates.io for malicious code, license violations |
+| Publisher auditing | `cargo-supply-chain` | Author, contributor, and publisher data for human review |
+| Version pinning | `Cargo.lock` (committed) | Surprise upstream updates |
+| License compliance | `cargo-deny` + `deny.toml` | Unapproved or copyleft licenses |
+
+### Banned Crates
+
+The following crates are banned via `deny.toml` and will fail CI:
+
+| Crate | Advisory | Reason |
+|-------|----------|--------|
+| `onering` | RUSTSEC-2026-0175 | Malicious code — removed from crates.io |
+| `logflux` | RUSTSEC-2026-0171 | Malicious code — removed from crates.io |
+| `exploration` | RUSTSEC-2026-0155 | Malicious code — removed from crates.io |
+
+### npm Supply Chain Defense
+
+| Layer | Tool | What it catches |
+|-------|------|-----------------|
+| Known vulnerabilities | `npm audit` | Packages with reported vulnerabilities |
+| Version pinning | `package-lock.json` (committed) | Surprise upstream updates |
+| Dependency updates | Dependabot | Weekly PRs for outdated deps |
+
 ## CI/CD Security
 
 - All GitHub Actions use `permissions: contents: read` by default
 - No secrets are passed to PRs from forks
-- Dependabot monitors dependencies for known vulnerabilities
-- Commits to `main` require verified signatures
+- Dependabot monitors dependencies for known vulnerabilities (cargo, npm, github-actions)
+- Commit signatures verified on all PRs to `main`
+- `cargo-audit`, `cargo-deny`, and `cargo-supply-chain` run on every push to `main`, every PR targeting `main`, and on the weekly schedule
+- Node version in CI matches local (24.x)
