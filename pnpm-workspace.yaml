@@ -1,0 +1,25 @@
+# pnpm supply chain security settings
+# See: https://pnpm.io/supply-chain-security
+
+# Block risky postinstall scripts in dependencies.
+# Only explicitly trusted packages listed here are allowed to run postinstall scripts.
+# If a dependency did not require a build in the past, it won't suddenly run a
+# malicious script if a compromised version is published.
+allowBuilds:
+  # Add trusted packages here as needed:
+  # esbuild: true
+  # sharp: true
+
+# Prevent transitive dependencies from using exotic sources
+# (git repositories, direct tarball URLs, etc.)
+# Ensures all transitive dependencies resolve from trusted sources.
+blockExoticSubdeps: true
+
+# Delay dependency updates by 48 hours (2880 minutes) to catch compromised versions.
+# Malware is usually detected quickly; waiting 24h prevents most bad installs.
+minimumReleaseAge: 2880
+
+# Prevent installation of a package if its trust level has decreased
+# compared to previous releases (e.g., was published by a trusted publisher
+# but now only has provenance or no trust evidence).
+trustPolicy: "no-downgrade"
