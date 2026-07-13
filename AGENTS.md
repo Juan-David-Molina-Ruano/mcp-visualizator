@@ -28,7 +28,7 @@
   - Submit PRs
   - Cannot bypass CI, force-push to `main`, or self-approve
 - **Forks**: Allowed — discoverability matters more than false security; anyone can `git clone` regardless
-- **Signed commits**: Required for all commits in PRs targeting `main` — verified by the `verify-signatures` CI job. Direct pushes to `main` require branch-protection-level enforcement.
+- **Signed commits**: Required for all commits in PRs targeting `main` and for all direct pushes to `main` — enforced by branch protection rules and verified by the `verify-signatures` CI job.
 - **PR reviews**: Required before merge — only owner approval counts
 - **CI checks**: Must pass before merge (Rust + frontend + security audits)
 - **Conventional commits**: Required (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `security:`)
