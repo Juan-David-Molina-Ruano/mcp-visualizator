@@ -17,7 +17,7 @@ jobs:
     name: Rust security audit (cargo-audit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Check if Rust project exists
@@ -45,7 +45,7 @@ jobs:
     name: Rust license & ban check (cargo-deny)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Check if Rust project exists
@@ -72,7 +72,7 @@ jobs:
     name: Rust publisher audit (cargo-supply-chain)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Check if Rust project exists
@@ -100,7 +100,7 @@ jobs:
     name: npm security audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Check if frontend project exists
