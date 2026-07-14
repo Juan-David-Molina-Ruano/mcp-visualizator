@@ -55,6 +55,13 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
             echo "Skipping Rust checks — src-tauri/Cargo.toml not found"
           fi
+      - name: Install system dependencies
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev \
+            libglib2.0-dev libgtk-3-dev
       - name: Install Rust
         if: steps.check.outputs.exists == 'true'
         uses: dtolnay/rust-toolchain@stable

@@ -2,10 +2,10 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| latest main | yes |
-| older | no |
+| Version     | Supported |
+| ----------- | --------- |
+| latest main | yes       |
+| older       | no        |
 
 ## Reporting a Vulnerability
 
@@ -14,6 +14,7 @@ If you discover a security vulnerability, please **DO NOT** open a public issue.
 Instead, email: **security@mcp-visualizer.dev** (or use GitHub's private vulnerability reporting).
 
 You will receive a response within 48 hours. Please include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
@@ -35,31 +36,31 @@ Rust and npm supply chain attacks are real. This project defends against them wi
 
 ### Rust Supply Chain Defense
 
-| Layer | Tool | What it catches |
-|-------|------|-----------------|
-| Known vulnerabilities | `cargo-audit` | RustSec advisories for unsafe or malicious crates |
-| Banned/malicious crates | `cargo-deny` | Crates pulled from crates.io for malicious code, license violations |
-| Publisher auditing | `cargo-supply-chain` | Author, contributor, and publisher data for human review |
-| Version pinning | `Cargo.lock` (committed) | Surprise upstream updates |
-| License compliance | `cargo-deny` + `deny.toml` | Unapproved or copyleft licenses |
+| Layer                   | Tool                       | What it catches                                                     |
+| ----------------------- | -------------------------- | ------------------------------------------------------------------- |
+| Known vulnerabilities   | `cargo-audit`              | RustSec advisories for unsafe or malicious crates                   |
+| Banned/malicious crates | `cargo-deny`               | Crates pulled from crates.io for malicious code, license violations |
+| Publisher auditing      | `cargo-supply-chain`       | Author, contributor, and publisher data for human review            |
+| Version pinning         | `Cargo.lock` (committed)   | Surprise upstream updates                                           |
+| License compliance      | `cargo-deny` + `deny.toml` | Unapproved or copyleft licenses                                     |
 
 ### Banned Crates
 
 The following crates are banned via `deny.toml` and will fail CI:
 
-| Crate | Advisory | Reason |
-|-------|----------|--------|
-| `onering` | RUSTSEC-2026-0175 | Malicious code — removed from crates.io |
-| `logflux` | RUSTSEC-2026-0171 | Malicious code — removed from crates.io |
+| Crate         | Advisory          | Reason                                  |
+| ------------- | ----------------- | --------------------------------------- |
+| `onering`     | RUSTSEC-2026-0175 | Malicious code — removed from crates.io |
+| `logflux`     | RUSTSEC-2026-0171 | Malicious code — removed from crates.io |
 | `exploration` | RUSTSEC-2026-0155 | Malicious code — removed from crates.io |
 
 ### npm Supply Chain Defense
 
-| Layer | Tool | What it catches |
-|-------|------|-----------------|
-| Known vulnerabilities | `npm audit` | Packages with reported vulnerabilities |
-| Version pinning | `package-lock.json` (committed) | Surprise upstream updates |
-| Dependency updates | Dependabot | Weekly PRs for outdated deps |
+| Layer                 | Tool                            | What it catches                        |
+| --------------------- | ------------------------------- | -------------------------------------- |
+| Known vulnerabilities | `npm audit`                     | Packages with reported vulnerabilities |
+| Version pinning       | `package-lock.json` (committed) | Surprise upstream updates              |
+| Dependency updates    | Dependabot                      | Weekly PRs for outdated deps           |
 
 ## CI/CD Security
 

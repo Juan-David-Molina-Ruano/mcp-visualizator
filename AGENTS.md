@@ -8,13 +8,13 @@
 
 ## Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Frontend | React + TypeScript | Latest |
-| Backend | Rust | Stable (via Rustup) |
-| Desktop | Tauri | 2.0 |
-| Runtime | Node.js | 24.x |
-| Package Manager | pnpm | 11.x |
+| Layer           | Technology         | Version             |
+| --------------- | ------------------ | ------------------- |
+| Frontend        | React + TypeScript | Latest              |
+| Backend         | Rust               | Stable (via Rustup) |
+| Desktop         | Tauri              | 2.0                 |
+| Runtime         | Node.js            | 24.x                |
+| Package Manager | pnpm               | 11.x                |
 
 ## Branching & Governance
 
@@ -40,33 +40,33 @@ Rust and npm supply chain attacks are real. Crates like `onering`, `logflux`, an
 
 ### Rust Supply Chain Defense
 
-| Tool | Purpose | Status |
-|------|---------|--------|
-| `cargo-audit` | Known vulnerability scanning (RustSec advisory DB) | CI (security.yml) |
-| `cargo-deny` | License compliance + banned crates + advisory checks | CI (security.yml) |
-| `cargo supply-chain` | Publisher auditing — who published each crate | CI (security.yml) |
-| `Cargo.lock` | Version pinning — committed to repo | Required |
-| `deny.toml` | Banned crate list + license policy | Repo root |
+| Tool                 | Purpose                                              | Status            |
+| -------------------- | ---------------------------------------------------- | ----------------- |
+| `cargo-audit`        | Known vulnerability scanning (RustSec advisory DB)   | CI (security.yml) |
+| `cargo-deny`         | License compliance + banned crates + advisory checks | CI (security.yml) |
+| `cargo supply-chain` | Publisher auditing — who published each crate        | CI (security.yml) |
+| `Cargo.lock`         | Version pinning — committed to repo                  | Required          |
+| `deny.toml`          | Banned crate list + license policy                   | Repo root         |
 
 ### npm/pnpm Supply Chain Defense
 
-| Tool / Setting | Purpose | Status |
-|----------------|---------|--------|
-| `pnpm audit` | Known vulnerability scanning | CI (security.yml) |
-| `pnpm-lock.yaml` | Version pinning — committed to repo | Required |
-| `allowBuilds` | Block postinstall scripts by default | pnpm-workspace.yaml |
-| `blockExoticSubdeps` | Block git/tarball transitive deps | pnpm-workspace.yaml |
-| `minimumReleaseAge: 2880` (numeric, minutes) | Delay new versions by 48h | pnpm-workspace.yaml |
-| `trustPolicy: no-downgrade` | Block trust-level downgrades | pnpm-workspace.yaml |
+| Tool / Setting                               | Purpose                              | Status              |
+| -------------------------------------------- | ------------------------------------ | ------------------- |
+| `pnpm audit`                                 | Known vulnerability scanning         | CI (security.yml)   |
+| `pnpm-lock.yaml`                             | Version pinning — committed to repo  | Required            |
+| `allowBuilds`                                | Block postinstall scripts by default | pnpm-workspace.yaml |
+| `blockExoticSubdeps`                         | Block git/tarball transitive deps    | pnpm-workspace.yaml |
+| `minimumReleaseAge: 2880` (numeric, minutes) | Delay new versions by 48h            | pnpm-workspace.yaml |
+| `trustPolicy: no-downgrade`                  | Block trust-level downgrades         | pnpm-workspace.yaml |
 
 ### Banned Crates
 
 The following crates are **banned** via `deny.toml` and will fail CI if used:
 
-| Crate | Reason | Advisory |
-|-------|--------|----------|
-| `onering` | Malicious code — removed from crates.io | RUSTSEC-2026-0175 |
-| `logflux` | Malicious code — removed from crates.io | RUSTSEC-2026-0171 |
+| Crate         | Reason                                  | Advisory          |
+| ------------- | --------------------------------------- | ----------------- |
+| `onering`     | Malicious code — removed from crates.io | RUSTSEC-2026-0175 |
+| `logflux`     | Malicious code — removed from crates.io | RUSTSEC-2026-0171 |
 | `exploration` | Malicious code — removed from crates.io | RUSTSEC-2026-0155 |
 
 Any crate marked as `malicious` in RustSec will also be caught by `cargo-audit` and `cargo-deny`.
@@ -103,33 +103,44 @@ This project uses **Spec-Driven Development (SDD)** via Gentle AI:
 ### SDD Phases
 
 ```text
-proposal → spec → design → tasks → apply → verify → archive
+proposal ✓ → spec ✓ → design ✓ → tasks ✓ → apply → verify → archive
 ```
+
+### Current Status
+
+| Phase    | Status  | Artifact                               |
+| -------- | ------- | -------------------------------------- |
+| Init     | ✓ Done  | `sdd-init/mcp-visualizador` (engram)   |
+| Proposal | ✓ Done  | `sdd/mcp-visualizer/proposal` (engram) |
+| Design   | ✓ Done  | `sdd/mcp-visualizer/design` (engram)   |
+| Spec     | ✓ Done  | `sdd/mcp-visualizer/spec` (engram)     |
+| Tasks    | ✓ Done  | `sdd/mcp-visualizer/tasks` (engram)    |
+| Apply    | Pending | —                                      |
 
 ### Engram Topic Keys
 
-| Artifact | Topic Key |
-|----------|-----------|
-| Init | `sdd-init/mcp-visualizador` |
-| Exploration | `sdd/mcp-visualizer/explore` |
-| Proposal | `sdd/mcp-visualizer/proposal` |
-| Spec | `sdd/mcp-visualizer/spec` |
-| Design | `sdd/mcp-visualizer/design` |
-| Tasks | `sdd/mcp-visualizer/tasks` |
+| Artifact       | Topic Key                           |
+| -------------- | ----------------------------------- |
+| Init           | `sdd-init/mcp-visualizador`         |
+| Exploration    | `sdd/mcp-visualizer/explore`        |
+| Proposal       | `sdd/mcp-visualizer/proposal`       |
+| Spec           | `sdd/mcp-visualizer/spec`           |
+| Design         | `sdd/mcp-visualizer/design`         |
+| Tasks          | `sdd/mcp-visualizer/tasks`          |
 | Apply progress | `sdd/mcp-visualizer/apply-progress` |
-| Verify report | `sdd/mcp-visualizer/verify-report` |
-| Architecture | `architecture/mcp-visualizador` |
+| Verify report  | `sdd/mcp-visualizer/verify-report`  |
+| Architecture   | `architecture/mcp-visualizador`     |
 
 ## Tooling Available
 
 ### MCP Servers
 
-| Server | Use |
-|--------|-----|
-| GitHub MCP | PRs, issues, branches, file operations, code search |
-| Supabase MCP | Database, auth, edge functions (if needed) |
-| SQL Server MCP | Read-only queries (personal dev DB) |
-| Stitch MCP | UI design generation (if needed) |
+| Server         | Use                                                 |
+| -------------- | --------------------------------------------------- |
+| GitHub MCP     | PRs, issues, branches, file operations, code search |
+| Supabase MCP   | Database, auth, edge functions (if needed)          |
+| SQL Server MCP | Read-only queries (personal dev DB)                 |
+| Stitch MCP     | UI design generation (if needed)                    |
 
 ### CodeGraph
 
@@ -148,31 +159,31 @@ proposal → spec → design → tasks → apply → verify → archive
 
 ### Installed Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `branch-pr` | Create PRs with issue-first checks |
-| `chained-pr` | Split >400 line changes into reviewable PRs |
-| `work-unit-commits` | Atomic, reviewable commit planning |
-| `comment-writer` | PR comments, issue replies, review feedback |
-| `cognitive-doc-design` | Docs that reduce cognitive load |
-| `issue-creation` | GitHub issues with checks |
-| `skill-registry` | Index and resolve skills |
-| `sdd-init` | Initialize SDD context |
-| `sdd-explore` | Explore ideas before committing |
-| `sdd-propose` | Create change proposals |
-| `sdd-spec` | Write delta specs |
-| `sdd-design` | Technical design |
-| `sdd-tasks` | Break changes into tasks |
-| `sdd-apply` | Implement tasks |
-| `sdd-verify` | Validate implementation |
-| `sdd-archive` | Archive completed changes |
-| `sdd-onboard` | End-to-end SDD walkthrough |
-| `judgment-day` | Adversarial dual review |
-| `supabase` | Supabase integration |
-| `supabase-postgres-best-practices` | Postgres optimization |
-| `go-testing` | Go testing patterns (available, not used) |
-| `skill-creator` | Create new skills |
-| `skill-improver` | Audit and improve skills |
+| Skill                              | Purpose                                     |
+| ---------------------------------- | ------------------------------------------- |
+| `branch-pr`                        | Create PRs with issue-first checks          |
+| `chained-pr`                       | Split >400 line changes into reviewable PRs |
+| `work-unit-commits`                | Atomic, reviewable commit planning          |
+| `comment-writer`                   | PR comments, issue replies, review feedback |
+| `cognitive-doc-design`             | Docs that reduce cognitive load             |
+| `issue-creation`                   | GitHub issues with checks                   |
+| `skill-registry`                   | Index and resolve skills                    |
+| `sdd-init`                         | Initialize SDD context                      |
+| `sdd-explore`                      | Explore ideas before committing             |
+| `sdd-propose`                      | Create change proposals                     |
+| `sdd-spec`                         | Write delta specs                           |
+| `sdd-design`                       | Technical design                            |
+| `sdd-tasks`                        | Break changes into tasks                    |
+| `sdd-apply`                        | Implement tasks                             |
+| `sdd-verify`                       | Validate implementation                     |
+| `sdd-archive`                      | Archive completed changes                   |
+| `sdd-onboard`                      | End-to-end SDD walkthrough                  |
+| `judgment-day`                     | Adversarial dual review                     |
+| `supabase`                         | Supabase integration                        |
+| `supabase-postgres-best-practices` | Postgres optimization                       |
+| `go-testing`                       | Go testing patterns (available, not used)   |
+| `skill-creator`                    | Create new skills                           |
+| `skill-improver`                   | Audit and improve skills                    |
 
 ### Skill Resolution Protocol
 

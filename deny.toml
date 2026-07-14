@@ -1,16 +1,39 @@
 # cargo-deny configuration
 # https://embarkstudios.github.io/cargo-deny/
-# This file defines supply chain policies for the MCP Visualizer project.
+# v0.20+ format
 
 [advisories]
+version = 2
 db-urls = ["https://github.com/rustsec/advisory-db"]
-vulnerability = "deny"
-unmaintained = "warn"
-yanked = "deny"
-notice = "warn"
+
+# Ignore transitive unmaintained advisories we can't control.
+# GTK3 crates are Linux-only, pulled transitively by Tauri.
+# unic-* crates are pulled transitively by Tauri's urlpattern dep.
+# proc-macro-error is pulled transitively by GTK3's glib-macros.
+ignore = [
+    # GTK3 bindings — Linux-only, unmaintained (use gtk4-rs)
+    "RUSTSEC-2024-0411",
+    "RUSTSEC-2024-0412",
+    "RUSTSEC-2024-0413",
+    "RUSTSEC-2024-0414",
+    "RUSTSEC-2024-0415",
+    "RUSTSEC-2024-0416",
+    "RUSTSEC-2024-0417",
+    "RUSTSEC-2024-0418",
+    "RUSTSEC-2024-0419",
+    "RUSTSEC-2024-0420",
+    # proc-macro-error — transitive via GTK3's glib-macros
+    "RUSTSEC-2024-0370",
+    # unic-* crates — transitive via Tauri's urlpattern
+    "RUSTSEC-2025-0075",
+    "RUSTSEC-2025-0080",
+    "RUSTSEC-2025-0081",
+    "RUSTSEC-2025-0098",
+    "RUSTSEC-2025-0100",
+]
 
 [licenses]
-unlicensed = "deny"
+# All licenses not in allow are denied by default.
 allow = [
     "MIT",
     "Apache-2.0",
@@ -22,14 +45,11 @@ allow = [
     "Unicode-3.0",
     "Zlib",
     "CC0-1.0",
+    "MPL-2.0",
 ]
-deny = []
-copyleft = "warn"
-default = "deny"
 
 [bans]
 # Banned crates — known malicious or dangerous
-# These will fail CI if any dependency tree includes them
 multiple-versions = "warn"
 wildcards = "warn"
 highlight = "all"
