@@ -1,0 +1,2 @@
+pnpm audit
+pnpm exec lint-staged

@@ -11,7 +11,9 @@ describe("App", () => {
   it("renders description text", () => {
     render(<App />);
     expect(
-      screen.getByText("Manage and monitor MCP servers across your AI coding tools.")
+      screen.getByText(
+        "Manage and monitor MCP servers across your AI coding tools.",
+      ),
     ).toBeDefined();
   });
 });

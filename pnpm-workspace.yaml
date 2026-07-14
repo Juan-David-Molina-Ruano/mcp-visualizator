@@ -4,19 +4,16 @@
 
 # ─── BUILD SCRIPT CONTROL ───────────────────────────────────────────
 # pnpm v11 blocks ALL lifecycle scripts by default.
-# strictDepBuilds: true (default) → install FAILS if any dep has
-# unreviewed build scripts not listed in allowBuilds.
-# Allowlist: only explicitly reviewed packages can run scripts.
-allowBuilds:
-  # Add trusted packages here after manual review:
-  # - Check publisher, purpose, and provenance on npm
-  # - Example: esbuild: true  (needs postinstall for binary)
-  # NEVER add packages you haven't reviewed.
+# Only explicitly reviewed packages can run build scripts.
+# Run "pnpm approve-builds" interactively when adding new build deps.
+onlyBuiltDependencies:
+  - esbuild
+  - "@tauri-apps/cli"
 
 # ─── SUPPLY CHAIN DELAY ─────────────────────────────────────────────
 # Wait 48 hours before installing any newly published version.
 # Malware is usually detected and removed within hours.
-minimumReleaseAge: 2880  # 48 hours in minutes
+minimumReleaseAge: 2880 # 48 hours in minutes
 
 # Fail if NO version in the requested range meets the age requirement.
 # false (default) would fall back to a younger version — we don't want that.
