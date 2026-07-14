@@ -103,8 +103,19 @@ This project uses **Spec-Driven Development (SDD)** via Gentle AI:
 ### SDD Phases
 
 ```text
-proposal → spec → design → tasks → apply → verify → archive
+proposal ✓ → spec ✓ → design ✓ → tasks ✓ → apply → verify → archive
 ```
+
+### Current Status
+
+| Phase | Status | Artifact |
+|-------|--------|----------|
+| Init | ✓ Done | `sdd-init/mcp-visualizador` (engram) |
+| Proposal | ✓ Done | `sdd/mcp-visualizer/proposal` (engram) |
+| Design | ✓ Done | `sdd/mcp-visualizer/design` (engram) |
+| Spec | ✓ Done | `sdd/mcp-visualizer/spec` (engram) |
+| Tasks | ✓ Done | `sdd/mcp-visualizer/tasks` (engram) |
+| Apply | Pending | — |
 
 ### Engram Topic Keys
 

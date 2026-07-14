@@ -1,25 +1,80 @@
-# pnpm supply chain security settings
-# See: https://pnpm.io/supply-chain-security
+# pnpm v11 supply chain security — maximum strictness
+# Docs: https://pnpm.io/supply-chain-security
+# Docs: https://pnpm.io/settings
 
-# Block risky postinstall scripts in dependencies.
-# Only explicitly trusted packages listed here are allowed to run postinstall scripts.
-# If a dependency did not require a build in the past, it won't suddenly run a
-# malicious script if a compromised version is published.
+# ─── BUILD SCRIPT CONTROL ───────────────────────────────────────────
+# pnpm v11 blocks ALL lifecycle scripts by default.
+# strictDepBuilds: true (default) → install FAILS if any dep has
+# unreviewed build scripts not listed in allowBuilds.
+# Allowlist: only explicitly reviewed packages can run scripts.
 allowBuilds:
-  # Add trusted packages here as needed:
-  # esbuild: true
-  # sharp: true
+  # Add trusted packages here after manual review:
+  # - Check publisher, purpose, and provenance on npm
+  # - Example: esbuild: true  (needs postinstall for binary)
+  # NEVER add packages you haven't reviewed.
 
-# Prevent transitive dependencies from using exotic sources
-# (git repositories, direct tarball URLs, etc.)
-# Ensures all transitive dependencies resolve from trusted sources.
+# ─── SUPPLY CHAIN DELAY ─────────────────────────────────────────────
+# Wait 48 hours before installing any newly published version.
+# Malware is usually detected and removed within hours.
+minimumReleaseAge: 2880  # 48 hours in minutes
+
+# Fail if NO version in the requested range meets the age requirement.
+# false (default) would fall back to a younger version — we don't want that.
+minimumReleaseAgeStrict: true
+
+# Fail if registry metadata lacks the time field (private registries/mirrors).
+# We want strict enforcement — no silent fallbacks.
+minimumReleaseAgeIgnoreMissingTime: false
+
+# ─── TRUST POLICY ───────────────────────────────────────────────────
+# Prevent installation if a package's trust level has decreased
+# (e.g., was published by trusted publisher, now has no provenance).
+trustPolicy: "no-downgrade"
+
+# Ignore trust checks for packages published more than N minutes ago.
+# Useful for very old packages that predate provenance signing.
+# Set to 0 to never ignore (strictest). Set to ~2 years for legacy compat.
+# trustPolicyIgnoreAfter: 1051200  # 2 years in minutes
+
+# ─── EXOTIC DEPENDENCIES ────────────────────────────────────────────
+# Block transitive deps from using git repos or tarball URLs.
+# Only DIRECT dependencies may use exotic sources.
 blockExoticSubdeps: true
 
-# Delay dependency updates by 48 hours (2880 minutes) to catch compromised versions.
-# Malware is usually detected quickly; waiting 24h prevents most bad installs.
-minimumReleaseAge: 2880
+# ─── VERSION PINNING ────────────────────────────────────────────────
+# Pin exact versions when running pnpm add (no ^ or ~ prefix).
+saveExact: true
+# savePrefix is ignored when saveExact is true, but set it for clarity:
+savePrefix: ""
 
-# Prevent installation of a package if its trust level has decreased
-# compared to previous releases (e.g., was published by a trusted publisher
-# but now only has provenance or no trust evidence).
-trustPolicy: "no-downgrade"
+# ─── PEER DEPENDENCIES ──────────────────────────────────────────────
+# Fail if there's a missing or invalid peer dependency.
+strictPeerDependencies: true
+
+# ─── STORE INTEGRITY ────────────────────────────────────────────────
+# Verify file contents before linking from store (default: true).
+verifyStoreIntegrity: true
+# Strict check for package name/version mismatches in store.
+strictStorePkgContentCheck: true
+
+# ─── DEPENDENCY VERIFICATION ────────────────────────────────────────
+# Verify deps are up to date before running scripts.
+# "error" = throw if node_modules is stale (strictest).
+# "install" = auto-install if stale (default, also good).
+verifyDepsBeforeRun: "error"
+
+# ─── NODE VERSION ENFORCEMENT ───────────────────────────────────────
+# Enforce the engines field in package.json of dependencies.
+engineStrict: true
+
+# ─── LOCKFILE ───────────────────────────────────────────────────────
+# Never skip the lockfile — always lock dependencies.
+lockfile: true
+# In CI, use frozen lockfile to prevent silent updates.
+# (set via CLI: pnpm install --frozen-lockfile)
+
+# ─── OVERRIDES ──────────────────────────────────────────────────────
+# Force semver to 7.x which has provenance attestation.
+# @babel/core 7.x depends on semver@^6.3.1 but 6.x lacks provenance.
+overrides:
+  semver@^6.3.1: "7.7.3"

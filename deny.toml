@@ -1,16 +1,23 @@
 # cargo-deny configuration
 # https://embarkstudios.github.io/cargo-deny/
-# This file defines supply chain policies for the MCP Visualizer project.
+# v0.20+ format
 
 [advisories]
+version = 2
 db-urls = ["https://github.com/rustsec/advisory-db"]
-vulnerability = "deny"
-unmaintained = "warn"
-yanked = "deny"
-notice = "warn"
+
+# Unmaintained crates: only fail for workspace (direct) deps.
+# Transitive unmaintained deps (gtk3 bindings via Tauri) are out of our control.
+unmaintained = "workspace"
+
+# Ignore specific advisories for transitive deps we can't control.
+# These are Linux-only (GTK3) crates pulled transitively by Tauri.
+# Safe to ignore when targeting Windows; revisit if targeting Linux.
+ignore = []
 
 [licenses]
-unlicensed = "deny"
+# All licenses not in allow are denied by default.
+# Removed deprecated fields: unlicensed, deny, copyleft, default, allow-osi-fsf-free.
 allow = [
     "MIT",
     "Apache-2.0",
@@ -22,14 +29,11 @@ allow = [
     "Unicode-3.0",
     "Zlib",
     "CC0-1.0",
+    "MPL-2.0",
 ]
-deny = []
-copyleft = "warn"
-default = "deny"
 
 [bans]
 # Banned crates — known malicious or dangerous
-# These will fail CI if any dependency tree includes them
 multiple-versions = "warn"
 wildcards = "warn"
 highlight = "all"
