@@ -65,7 +65,7 @@ jobs:
         run: cargo install cargo-deny
       - name: Run cargo-deny checks
         if: steps.check.outputs.exists == 'true'
-        run: cargo deny check --manifest-path src-tauri/Cargo.toml
+        run: cargo deny --manifest-path src-tauri/Cargo.toml check
 
   # Publisher auditing — who published each crate in the dependency tree
   cargo-supply-chain:
@@ -126,4 +126,4 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: pnpm audit
         if: steps.check.outputs.exists == 'true'
-        run: pnpm audit --audit-level=high
+        run: pnpm audit

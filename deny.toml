@@ -6,18 +6,34 @@
 version = 2
 db-urls = ["https://github.com/rustsec/advisory-db"]
 
-# Unmaintained crates: only fail for workspace (direct) deps.
-# Transitive unmaintained deps (gtk3 bindings via Tauri) are out of our control.
-unmaintained = "workspace"
-
-# Ignore specific advisories for transitive deps we can't control.
-# These are Linux-only (GTK3) crates pulled transitively by Tauri.
-# Safe to ignore when targeting Windows; revisit if targeting Linux.
-ignore = []
+# Ignore transitive unmaintained advisories we can't control.
+# GTK3 crates are Linux-only, pulled transitively by Tauri.
+# unic-* crates are pulled transitively by Tauri's urlpattern dep.
+# proc-macro-error is pulled transitively by GTK3's glib-macros.
+ignore = [
+    # GTK3 bindings — Linux-only, unmaintained (use gtk4-rs)
+    "RUSTSEC-2024-0411",
+    "RUSTSEC-2024-0412",
+    "RUSTSEC-2024-0413",
+    "RUSTSEC-2024-0414",
+    "RUSTSEC-2024-0415",
+    "RUSTSEC-2024-0416",
+    "RUSTSEC-2024-0417",
+    "RUSTSEC-2024-0418",
+    "RUSTSEC-2024-0419",
+    "RUSTSEC-2024-0420",
+    # proc-macro-error — transitive via GTK3's glib-macros
+    "RUSTSEC-2024-0370",
+    # unic-* crates — transitive via Tauri's urlpattern
+    "RUSTSEC-2025-0075",
+    "RUSTSEC-2025-0080",
+    "RUSTSEC-2025-0081",
+    "RUSTSEC-2025-0098",
+    "RUSTSEC-2025-0100",
+]
 
 [licenses]
 # All licenses not in allow are denied by default.
-# Removed deprecated fields: unlicensed, deny, copyleft, default, allow-osi-fsf-free.
 allow = [
     "MIT",
     "Apache-2.0",

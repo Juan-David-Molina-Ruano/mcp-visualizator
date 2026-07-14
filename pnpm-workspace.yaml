@@ -6,9 +6,9 @@
 # pnpm v11 blocks ALL lifecycle scripts by default.
 # Only explicitly reviewed packages can run build scripts.
 # Run "pnpm approve-builds" interactively when adding new build deps.
-onlyBuiltDependencies:
-  - esbuild
-  - "@tauri-apps/cli"
+allowBuilds:
+  esbuild: true
+  "@tauri-apps/cli": true
 
 # ─── SUPPLY CHAIN DELAY ─────────────────────────────────────────────
 # Wait 48 hours before installing any newly published version.
