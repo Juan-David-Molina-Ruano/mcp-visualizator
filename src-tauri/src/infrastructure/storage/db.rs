@@ -143,11 +143,7 @@ impl Database {
         &self,
         mcp_name: &str,
         state: &str,
-        latency_ms: Option<f64>,
-        errors: u32,
-        uptime_s: u64,
-        cpu_pct: Option<f64>,
-        mem_mb: Option<f64>,
+        metrics: &TelemetrySnapshotData,
     ) -> Result<(), AppError> {
         let timestamp = chrono_now_iso();
         self.conn
@@ -155,7 +151,16 @@ impl Database {
                 "INSERT INTO telemetry_snapshots
                  (mcp_name, timestamp, state, latency_ms, errors, uptime_s, cpu_pct, mem_mb)
                  VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-                params![mcp_name, timestamp, state, latency_ms, errors, uptime_s, cpu_pct, mem_mb],
+                params![
+                    mcp_name,
+                    timestamp,
+                    state,
+                    metrics.latency_ms,
+                    metrics.errors,
+                    metrics.uptime_s,
+                    metrics.cpu_pct,
+                    metrics.mem_mb,
+                ],
             )
             .map_err(|e| AppError::Database(format!("Cannot insert telemetry: {e}")))?;
         Ok(())
@@ -242,6 +247,16 @@ impl Database {
             .map_err(|e| AppError::Database(format!("Cannot accumulate usage: {e}")))?;
         Ok(())
     }
+}
+
+/// Data for inserting a telemetry snapshot (infrastructure-level, not tied to domain models).
+#[derive(Debug)]
+pub struct TelemetrySnapshotData {
+    pub latency_ms: Option<f64>,
+    pub errors: u32,
+    pub uptime_s: u64,
+    pub cpu_pct: Option<f64>,
+    pub mem_mb: Option<f64>,
 }
 
 /// Row from telemetry_snapshots table.
@@ -354,16 +369,15 @@ mod tests {
     fn telemetry_insert_and_query() {
         let db = Database::new_in_memory().unwrap();
 
-        db.insert_telemetry_snapshot(
-            "test-mcp",
-            "running",
-            Some(42.5),
-            0,
-            300,
-            Some(1.2),
-            Some(25.6),
-        )
-        .unwrap();
+        let metrics = TelemetrySnapshotData {
+            latency_ms: Some(42.5),
+            errors: 0,
+            uptime_s: 300,
+            cpu_pct: Some(1.2),
+            mem_mb: Some(25.6),
+        };
+        db.insert_telemetry_snapshot("test-mcp", "running", &metrics)
+            .unwrap();
 
         let history = db.get_telemetry_history("test-mcp", 3600).unwrap();
         assert_eq!(history.len(), 1);

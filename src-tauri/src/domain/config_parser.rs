@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde_json::Value;
 
@@ -32,10 +32,10 @@ pub trait ConfigParser: Send + Sync {
 
     /// Parse config file into normalized McpServer list.
     /// Returns servers plus raw metadata for write-back fidelity.
-    fn parse(&self, path: &PathBuf) -> Result<ParseResult, AppError>;
+    fn parse(&self, path: &Path) -> Result<ParseResult, AppError>;
 
     /// Write servers back to config file, preserving untouched keys.
-    fn write_back(&self, path: &PathBuf, request: WriteBackRequest) -> Result<(), AppError>;
+    fn write_back(&self, path: &Path, request: WriteBackRequest) -> Result<(), AppError>;
 
     /// Provider this parser handles.
     fn provider_id(&self) -> ProviderId;
