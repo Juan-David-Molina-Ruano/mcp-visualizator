@@ -1,0 +1,16 @@
+{
+  "mcp": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "env": { "ROOT": "/home/user" }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "test-token" }
+    }
+  },
+  "theme": "dark",
+  "editor": { "fontSize": 14 }
+}
