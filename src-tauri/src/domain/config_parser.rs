@@ -35,11 +35,7 @@ pub trait ConfigParser: Send + Sync {
     fn parse(&self, path: &PathBuf) -> Result<ParseResult, AppError>;
 
     /// Write servers back to config file, preserving untouched keys.
-    fn write_back(
-        &self,
-        path: &PathBuf,
-        request: WriteBackRequest,
-    ) -> Result<(), AppError>;
+    fn write_back(&self, path: &PathBuf, request: WriteBackRequest) -> Result<(), AppError>;
 
     /// Provider this parser handles.
     fn provider_id(&self) -> ProviderId;

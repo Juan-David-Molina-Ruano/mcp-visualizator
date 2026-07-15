@@ -354,8 +354,16 @@ mod tests {
     fn telemetry_insert_and_query() {
         let db = Database::new_in_memory().unwrap();
 
-        db.insert_telemetry_snapshot("test-mcp", "running", Some(42.5), 0, 300, Some(1.2), Some(25.6))
-            .unwrap();
+        db.insert_telemetry_snapshot(
+            "test-mcp",
+            "running",
+            Some(42.5),
+            0,
+            300,
+            Some(1.2),
+            Some(25.6),
+        )
+        .unwrap();
 
         let history = db.get_telemetry_history("test-mcp", 3600).unwrap();
         assert_eq!(history.len(), 1);

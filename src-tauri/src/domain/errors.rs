@@ -64,10 +64,7 @@ mod tests {
         let err = AppError::ConfigNotFound {
             path: PathBuf::from("/tmp/test.json"),
         };
-        assert_eq!(
-            err.to_string(),
-            "Config file not found: /tmp/test.json"
-        );
+        assert_eq!(err.to_string(), "Config file not found: /tmp/test.json");
 
         let err = AppError::Validation("name is required".into());
         assert_eq!(err.to_string(), "MCP validation error: name is required");
