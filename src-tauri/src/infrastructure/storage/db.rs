@@ -110,20 +110,24 @@ impl Database {
     /// Get all settings as AppSettings.
     pub fn get_all_settings(&self) -> Result<AppSettings, AppError> {
         let polling: u64 = self
-            .get_setting("polling_interval_ms")?
-            .parse()
+            .get_setting("polling_interval_ms")
+            .ok()
+            .and_then(|v| v.parse().ok())
             .unwrap_or(30_000);
         let spawn: u64 = self
-            .get_setting("spawn_timeout_secs")?
-            .parse()
+            .get_setting("spawn_timeout_secs")
+            .ok()
+            .and_then(|v| v.parse().ok())
             .unwrap_or(10);
         let ping: u64 = self
-            .get_setting("ping_timeout_secs")?
-            .parse()
+            .get_setting("ping_timeout_secs")
+            .ok()
+            .and_then(|v| v.parse().ok())
             .unwrap_or(5);
         let threshold: u32 = self
-            .get_setting("consecutive_failures_threshold")?
-            .parse()
+            .get_setting("consecutive_failures_threshold")
+            .ok()
+            .and_then(|v| v.parse().ok())
             .unwrap_or(3);
 
         Ok(AppSettings {
@@ -253,17 +257,62 @@ pub struct TelemetryRow {
     pub mem_mb: Option<f64>,
 }
 
+/// Convert epoch seconds to ISO 8601 UTC string using Hinnant's algorithm.
 fn chrono_now_iso() -> String {
-    let now = std::time::SystemTime::now()
+    let secs = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-    format!("{}T00:00:00Z", now)
+
+    let days = (secs / 86400) as i64;
+    let time_of_day = secs % 86400;
+    let h = time_of_day / 3600;
+    let m = (time_of_day % 3600) / 60;
+    let s = time_of_day % 60;
+
+    // Howard Hinnant's date algorithm (public domain)
+    let z = days + 719468;
+    let era = (if z >= 0 { z } else { z - 146096 }) / 146097;
+    let doe = (z - era * 146097) as u64;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let y = yoe as i64 + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let mo = if mp < 10 { mp + 3 } else { mp - 9 };
+    let y = if mo <= 2 { y + 1 } else { y };
+
+    format!("{y:04}-{mo:02}-{d:02}T{h:02}:{m:02}:{s:02}Z")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn chrono_now_iso_returns_valid_iso8601() {
+        let ts = chrono_now_iso();
+        assert_eq!(ts.len(), 20, "ISO 8601 UTC should be 20 chars: {ts}");
+        assert!(ts.ends_with('Z'), "must end with Z: {ts}");
+        assert_eq!(&ts[4..5], "-");
+        assert_eq!(&ts[7..8], "-");
+        assert_eq!(&ts[10..11], "T");
+        assert_eq!(&ts[13..14], ":");
+        assert_eq!(&ts[16..17], ":");
+        let year: i32 = ts[..4].parse().expect("year parseable");
+        assert!(year >= 2024 && year <= 2099, "year out of range: {year}");
+    }
+
+    #[test]
+    fn get_all_settings_returns_defaults_when_missing() {
+        let db = Database::new_in_memory().unwrap();
+        // Delete one default setting to verify graceful fallback
+        db.conn
+            .execute("DELETE FROM settings WHERE key = 'ping_timeout_secs'", [])
+            .unwrap();
+        let settings = db.get_all_settings().unwrap();
+        assert_eq!(settings.ping_timeout_secs, 5); // falls back to default
+    }
 
     #[test]
     fn db_migrations_creates_tables() {
