@@ -1,0 +1,10 @@
+[mcp_servers.filesystem]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem"]
+
+[mcp_servers.fetch]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-fetch"]
+
+[settings]
+model = "o3"

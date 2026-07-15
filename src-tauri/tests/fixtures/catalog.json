@@ -1,0 +1,39 @@
+[
+  {
+    "name": "filesystem",
+    "description": "Access local files and directories with read/write operations",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem"
+  },
+  {
+    "name": "github",
+    "description": "Interact with GitHub repositories, issues, and pull requests",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "env": { "GITHUB_TOKEN": "" },
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/github"
+  },
+  {
+    "name": "supabase",
+    "description": "Query and manage Supabase databases, auth, and edge functions",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-supabase"],
+    "env": { "SUPABASE_URL": "", "SUPABASE_KEY": "" },
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/supabase"
+  },
+  {
+    "name": "puppeteer",
+    "description": "Browser automation and web scraping with Puppeteer",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer"
+  },
+  {
+    "name": "fetch",
+    "description": "Fetch web content and convert to markdown",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-fetch"],
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
+  }
+]
